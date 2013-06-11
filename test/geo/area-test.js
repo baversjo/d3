@@ -31,6 +31,18 @@ suite.addBatch({
           [-64.66070178517852, 18.33986913231323]
         ]]}), 4.890516e-13, 1e-13);
       },
+      "zero area": function(area) {
+        assert.equal(area({
+          "type": "Polygon",
+          "coordinates": [[
+            [96.79142432523281, 5.262704519048153],
+            [96.81065389253769, 5.272455576551362],
+            [96.82988345984256, 5.272455576551362],
+            [96.81065389253769, 5.272455576551362],
+            [96.79142432523281, 5.262704519048153]
+          ]]
+        }), 0);
+      },
       "semilune": function(area) {
         assert.inDelta(area({type: "Polygon", coordinates: [[[0, 0], [0, 90], [90, 0], [0, 0]]]}), π / 2, 1e-6);
       },
@@ -106,6 +118,16 @@ suite.addBatch({
             ]
           }), π * (Math.SQRT2 - 1), 1e-5);
         },
+        "100° with 80° hole": function(area) {
+          var circle = _.geo.circle().precision(.1);
+          assert.inDelta(area({
+            type: "Polygon",
+            coordinates: [
+              circle.angle(100)().coordinates[0],
+              circle.angle(80)().coordinates[0].reverse()
+            ]
+          }), 2.182127, 1e-6);
+        },
         "45° holes at [0°, 0°] and [0°, 90°]": function(area) {
           var circle = _.geo.circle().precision(.1).angle(45);
           assert.inDelta(area({
@@ -137,6 +159,11 @@ suite.addBatch({
         "45°, 30°": function(area) {
           assert.inDelta(area(stripes(45, 30)), π * (Math.SQRT2 - 1), 1e-5);
         }
+      },
+      "narrow strip hole, length 340°": function(area) {
+        assert.inDelta(area({type: "Polygon", coordinates: [
+          [[-170, -10], [0, -10], [170, -10], [170, 10], [0, 10], [-170, 10], [-170, -10]]
+        ]}), 3.733637, 1e-6);
       }
     },
     "MultiPolygon": {
